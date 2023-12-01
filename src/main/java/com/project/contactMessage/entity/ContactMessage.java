@@ -12,11 +12,13 @@ import java.time.LocalDateTime;
 
 @Entity
 
-@Data
+@Data//içinde getter-setter var
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder(toBuilder = true)
-public class ContactMessage {
+@Builder(toBuilder = true) //parametreli constructor'ları arka tarafta bizim için setliyor
+public class ContactMessage { //public class ContactMessage implements Serializable { apiden dışarı çıkacak
+     // setlenen nesnelerin serileştirilmesi gerekir
+     // restfull api json bizim için bu işlemi yaptığı için yazmıyoruz.
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
