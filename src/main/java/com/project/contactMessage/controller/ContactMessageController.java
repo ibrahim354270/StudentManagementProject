@@ -25,7 +25,7 @@ public class ContactMessageController {
 
         return contactMessageService.save(contactMessageRequest);
     }
-    @GetMapping("/getAll") // http://localhost:8080/contactMessages/getAll + GET
+    @GetMapping("/getAll") // http://localhost:8080/contactMessages/getAll + GET ->page şeklinde tüm contactMessages'ler
     public Page<ContactMessageResponse> getAll(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size",defaultValue = "10") int size,
@@ -35,7 +35,7 @@ public class ContactMessageController {
         return contactMessageService.getAll(page,size,sort,type);
     }
     @GetMapping("/searchByEmail") // http://localhost:8080/contactMessages/searchByEmail?email=aaa@bbb.com + GET
-    public Page<ContactMessageResponse> searchByEmail(
+    public Page<ContactMessageResponse> searchByEmail(  //email ile sorgulama
             @RequestParam(value = "email") String email,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size",defaultValue = "10") int size,
@@ -45,7 +45,7 @@ public class ContactMessageController {
         return contactMessageService.searchByEmail(email,page,size,sort,type);
     }
     @GetMapping("/searchBySubject") // http://localhost:8080/contactMessages/searchBySubject?subject=deneme + GET
-    public Page<ContactMessageResponse> searchBySubject(
+    public Page<ContactMessageResponse> searchBySubject( //subject' e göre sorgulama
             @RequestParam(value = "subject") String subject,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size",defaultValue = "10") int size,
@@ -73,7 +73,7 @@ public class ContactMessageController {
         return ResponseEntity.ok(contactMessageService.getContactMessageById(contactMessageId));
     }
     @GetMapping("/searchBetweenDates")// http://localhost:8080/contactMessages/searchBetweenDates?beginDate=2023-09-13&endDate=2023-09-15  + GET
-    public ResponseEntity<List<ContactMessage>> searchBetweenDates(
+    public ResponseEntity<List<ContactMessage>> searchBetweenDates( //iki tarih arasındaki mesajlar
             @RequestParam(value = "beginDate") String beginDateString,
             @RequestParam(value = "endDate") String endDateString
     ){
@@ -81,7 +81,7 @@ public class ContactMessageController {
         return ResponseEntity.ok(contactMessages);
     }
     @GetMapping("/searchBetweenTimes") // http://localhost:8080/contactMessages/searchBetweenTimes?startHour=09&startMinute=00&endHour=17&endMinute=30  + GET
-    public ResponseEntity<List<ContactMessage>> searchBetweenTimes(
+    public ResponseEntity<List<ContactMessage>> searchBetweenTimes( //iki saat arasındaki mesajlar için
             @RequestParam(value = "startHour") String startHour,
             @RequestParam(value = "startMinute") String startMinute,
             @RequestParam(value = "endHour") String endHour,

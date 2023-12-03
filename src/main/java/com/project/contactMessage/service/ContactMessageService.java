@@ -88,7 +88,7 @@ public class ContactMessageService {
 
     public List<ContactMessage> searchByDateBetween(String beginDateString, String endDateString) {
         try {
-            LocalDate beginDate = LocalDate.parse(beginDateString);
+            LocalDate beginDate = LocalDate.parse(beginDateString); //bu işlem ile datetime dan sadece tarih kısmını alıyoruz
             LocalDate endDate = LocalDate.parse(endDateString);
             return contactMessageRepository.findMessagesBetweenDates(beginDate,endDate);
         } catch (DateTimeParseException e) {
@@ -99,10 +99,10 @@ public class ContactMessageService {
     public List<ContactMessage> searchBetweenTimes(String startHour, String startMinute, String endHour, String endMinute) {
 
         try {
-            int startH =  Integer.parseInt(startHour);
-            int startM =  Integer.parseInt(startMinute);
-            int endH =  Integer.parseInt(endHour);
-            int endM =  Integer.parseInt(endMinute);
+            int startH =  Integer.parseInt(startHour); //başlangıç saati
+            int startM =  Integer.parseInt(startMinute);//başlangıç dakikası
+            int endH =  Integer.parseInt(endHour);//bitiş saati
+            int endM =  Integer.parseInt(endMinute);//bitiş dakikası
 
             return contactMessageRepository.findMessagesBetweenTimes(startH,startM,endH,endM);
         } catch (NumberFormatException e) {
