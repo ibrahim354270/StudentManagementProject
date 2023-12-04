@@ -28,9 +28,9 @@ public interface ContactMessageRepository extends JpaRepository<ContactMessage,L
             //1-benim saatim başlangıç ile bitiş arasında mı?
             "(EXTRACT(HOUR FROM c.dateTime) BETWEEN :startH AND :endH) AND " +
             //2-benim saatim başlangıç saatine eşit değil mi? veya dakikam başlangıç dakikasına eşit veya büyük mü?
-            "(EXTRACT(HOUR FROM c.dateTime) != :startH OR (EXTRACT(MINUTE FROM c.dateTime) >= :startM) AND " +
+            "(EXTRACT(HOUR FROM c.dateTime) != :startH OR EXTRACT(MINUTE FROM c.dateTime) >= :startM) AND " +
             //3-benim saatim bitiş saatine eşit değil mi? veya dakikam bitiş dakikasına eşit veya küçük mü?
-            "(EXTRACT(HOUR FROM c.dateTime) != :endH OR (EXTRACT(MINUTE FROM c.dateTime) <= :endM)")
+            "(EXTRACT(HOUR FROM c.dateTime) != :endH OR EXTRACT(MINUTE FROM c.dateTime) <= :endM)")
     List<ContactMessage> findMessagesBetweenTimes(@Param("startH") int startH, @Param("startM") int startM,
                                                   @Param("endH") int endH, @Param("endM") int endM);
 
