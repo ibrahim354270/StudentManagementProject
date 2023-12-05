@@ -22,7 +22,7 @@ public class StudentInfo {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
 
-   private Integer absentee;
+   private Integer absentee;//devamsızlık
 
    private Double midtermExam;
 
@@ -43,6 +43,11 @@ public class StudentInfo {
    @JsonIgnore
    private User student;
 
-   // TODO: LESSON - EducationTerm eklenecek
+   @ManyToOne
+   private Lesson lesson;
+
+   @OneToOne
+   private EducationTerm educationTerm;
+
 
 }
