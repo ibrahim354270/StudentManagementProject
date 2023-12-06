@@ -1,5 +1,7 @@
 package com.project.security.service;
 
+import com.project.entity.concretes.user.User;
+import com.project.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,9 +12,18 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+    private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+
+        User user = userRepository.findByUsernameEquals(username);
+
+        if(user != null){
+            return new UserDetailsImpl(user.getId(), user.getUsername(),
+                    user.getName(),false, user.getPassword(),user.getUserRole().getRoleType().name,user.getSsn());
+        }
+
+        throw new UsernameNotFoundException("User' " + username + " not found");
     }
 }

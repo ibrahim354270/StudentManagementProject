@@ -32,7 +32,7 @@ public class UserDetailsImpl implements UserDetails {
         this.username = username;
         this.name = name;
         this.isAdvisor = isAdvisor;
-        this.password = password;
+        this.password = password; //rolleri grantedAuthorities e çeviriyoruz
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority(role));
         this.authorities=grantedAuthorities;
