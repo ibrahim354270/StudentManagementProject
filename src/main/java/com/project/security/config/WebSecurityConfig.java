@@ -84,11 +84,13 @@ public class WebSecurityConfig {
     }
 
     private static final String[] AUTH_WHITE_LIST = { //security den muaf tutulanlar
-            "/",
+            "/", // localhost a herhangi bir kullanıcı girebilsin
             "/index.html",
             "/images/**",
             "/css/**",
             "/js?/**",
-            "/contactMessages/save"
+            "/contactMessages/save",
+            "/auth/login"
+
     };
 }
