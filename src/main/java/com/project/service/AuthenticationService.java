@@ -48,7 +48,7 @@ public class AuthenticationService {
         //!!! JWT token olusturuluyor
         String token = "Bearer " + jwtUtils.generateJwtToken(authentication);
         //!!! Response nesnesi olusturuluyor
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();//giriş yapan kullanıcıyı getirmek için
         //!!! grantedAuth --> Role ( String )
         Set<String> roles = userDetails.getAuthorities()
                 .stream() // Sream<GrantedAuth>
@@ -78,8 +78,8 @@ public class AuthenticationService {
 
     public void updatePassword(UpdatePasswordRequest updatePasswordRequest, HttpServletRequest request) {
 
-      String userName = (String) request.getAttribute("username");
-     User user = userRepository.findByUsername(userName);
+      String userName = (String) request.getAttribute("username");//Requestten username field getir.
+     User user = userRepository.findByUsername(userName);//db de bu isimli kullanıcı var mı?
 
      //!!! Build_IN kontrolü
         if(Boolean.TRUE.equals(user.getBuilt_in())){
@@ -92,7 +92,7 @@ public class AuthenticationService {
         if(!passwordEncoder.matches(updatePasswordRequest.getOldPassword(),user.getPassword())){
             throw new BadRequestException(ErrorMessages.PASSWORD_NOT_MATCHED);
         }
-        ///!!! Yeni şifre encode edilecek
+        ///!!! Yeni şifre hashlenerek encode edilecek
         String hashPassword =  passwordEncoder.encode(updatePasswordRequest.getNewPassword());
 
         //!!!update
