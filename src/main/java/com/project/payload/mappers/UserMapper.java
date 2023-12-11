@@ -4,12 +4,16 @@ import com.project.entity.concretes.user.User;
 import com.project.payload.request.abstracts.BaseUserRequest;
 import com.project.payload.request.user.UserRequest;
 import com.project.payload.response.UserResponse;
+import com.project.payload.response.abstracts.BaseUserResponse;
+import com.project.payload.response.user.StudentResponse;
+import com.project.payload.response.user.TeacherResponse;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapper { //pojoyu DTO ya çevireceğiz
+public class UserMapper {
 
-    public UserResponse mapUserToUserResponse(User user) {
+    // !!! POJO --> DTO
+    public UserResponse mapUserToUserResponse(User user){
         return UserResponse.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
@@ -24,16 +28,9 @@ public class UserMapper { //pojoyu DTO ya çevireceğiz
                 .userRole(user.getUserRole().getRoleType().name())
                 .build();
     }
-    //!!! DTO-->POJO
 
-    //DTO-->pojo
-//baseUserRequest ini extend eden tüm classlar bunu methodu kullanabilir.
-//sadece user request yapsaydık ,teacher ve student request kullanamazlardır,
-// oysaki onlarda baseUserRequestten extend yapmıştı.Aynı classın cocukları,abstract kullanmamızın en önemli etkeni
-//bu yaptığımız ile polimorrphism özelliği ortaya çıkar.
-
-    //public  User mapUserRequestToUser (UserRequest userRequest){ böyle olmaz
-    public User mapUserRequestToUser(BaseUserRequest userRequest) { //Base olursa student/teacher üretebiliriz(poliformizm)
+    //!!! DTO --> POJO
+    public User mapUserRequestToUser(BaseUserRequest userRequest){
 
         return User.builder()
                 .username(userRequest.getUsername())
@@ -49,6 +46,45 @@ public class UserMapper { //pojoyu DTO ya çevireceğiz
                 .built_in(userRequest.getBuiltIn())
                 .build();
     }
+
+    public StudentResponse mapUserToStudentResponse(User student) {
+
+        return StudentResponse.builder()
+                .userId(student.getId())
+                .username(student.getUsername())
+                .name(student.getName())
+                .surname(student.getSurname())
+                .birthDay(student.getBirthDay())
+                .birthPlace(student.getBirthPlace())
+                .phoneNumber(student.getPhoneNumber())
+                .gender(student.getGender())
+                .email(student.getEmail())
+                .fatherName(student.getFatherName())
+                .motherName(student.getMotherName())
+                .studentNumber(student.getStudentNumber())
+                .isActive(student.isActive())
+                .build();
+
+    }
+
+    public TeacherResponse mapUserToTeacherResponse(User teacher) {
+
+        return TeacherResponse.builder()
+                .userId(teacher.getId())
+                .username(teacher.getUsername())
+                .name(teacher.getName())
+                .surname(teacher.getSurname())
+                .birthDay(teacher.getBirthDay())
+                .birthPlace(teacher.getBirthPlace())
+                .ssn(teacher.getSsn())
+                .phoneNumber(teacher.getPhoneNumber())
+                .gender(teacher.getGender())
+                .email(teacher.getEmail())
+                .lessonPrograms(teacher.getLessonProgramList())
+                .isAdvisorTeacher(teacher.getIsAdvisor())
+                .build();
+    }
 }
+
 //abstract yerine interface kullansaydikda yine interface date type
 // olarak hepsi kullanabilirdik
