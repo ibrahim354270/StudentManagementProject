@@ -84,6 +84,22 @@ public class UserMapper {
                 .isAdvisorTeacher(teacher.getIsAdvisor())
                 .build();
     }
+    public User mapUserRequestToUpdatedUser(UserRequest userRequest, Long userId) {
+        return User.builder()
+                .id((userId))
+                .username(userRequest.getUsername())
+                .name(userRequest.getName())
+                .surname(userRequest.getSurname())
+                .password(userRequest.getPassword())
+                .ssn(userRequest.getSsn())
+                .birthDay(userRequest.getBirthDay())
+                .birthPlace(userRequest.getBirthPlace())
+                .phoneNumber(userRequest.getPhoneNumber())
+                .gender(userRequest.getGender())
+                .email(userRequest.getEmail())
+                .build();
+    }
+
 }
 
 //abstract yerine interface kullansaydikda yine interface date type
