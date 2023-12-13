@@ -1,4 +1,5 @@
 package com.project.service;
+
 import com.project.entity.concretes.user.User;
 import com.project.entity.concretes.user.UserRole;
 import com.project.entity.enums.RoleType;
@@ -152,7 +153,7 @@ public class UserService {
         //!!! DTO --> POJO
         User updatedUser = userMapper.mapUserRequestToUpdatedUser(userRequest, userId);
 
-        //!!! Password encode
+        //!!! Password encode //id ile aldığımız user i kullansak tekrar hashlenmiş olacak tı bu yüzden request üzerinden gelen password u kullandık
         updatedUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
         //!!! Rol setleniyor

@@ -8,6 +8,8 @@ import java.util.Optional;
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRole, Integer> {
     @Query("SELECT r FROM UserRole r WHERE r.roleType = ?1") //aşağıda gelen rol tipi ile eşit olan
+        //userRoletablosuna git bunun roletype colonunda  findByEnumRoleEquals methodun parametresinde gelen degere eşit
+        //olan user rollerimi bana döndür demiş oluyorum
     Optional<UserRole> findByEnumRoleEquals(RoleType roleType);
 }
 
