@@ -16,27 +16,27 @@ import java.time.LocalDate;
 
 @SpringBootApplication
 public class StudentManagementApplication implements CommandLineRunner {
+
 	private final UserRoleService userRoleService;
+
 	private final UserService userService;
 	private final UserRoleRepository userRoleRepository;
 
 	public StudentManagementApplication(UserRoleService userRoleService,
 										UserService userService,
 										UserRoleRepository userRoleRepository) {
-		this.userRoleService = userRoleService; //const. inject
+		this.userRoleService = userRoleService;
 		this.userService = userService;
 		this.userRoleRepository = userRoleRepository;
 	}
 
 	public static void main(String[] args) {
-
 		SpringApplication.run(StudentManagementApplication.class, args);
 	}
 
-	@Override //uygulama çalışmadan bu kısmın body si calışır
-	public void run(String... args) throws Exception {
-
-//!!! Role tablomu bos ise dolduracagiz
+	@Override
+	public void run(String... args) throws Exception { //uygulama çalışmadan bu kısmın body si calışır
+		//!!! Role tablomu bos ise dolduracagiz
 		if (userRoleService.getAllUserRoles().isEmpty()) {
 			UserRole admin = new UserRole();
 
@@ -65,32 +65,24 @@ public class StudentManagementApplication implements CommandLineRunner {
 			userRoleRepository.save(student);
 
 		}
-			//!!! Admin yoksa BuiltIn Admin olusturuluyor
-			if (userService.countAllAdmins() == 0) {
-				UserRequest adminRequest = new UserRequest();
-				adminRequest.setUsername("SuperAdmin"); // builtIN degeri TRUE olarak setlenmis olacak
-				adminRequest.setEmail("admin@admin.com");
-				adminRequest.setSsn("111-11-1111");
-				adminRequest.setPassword("12345678");
-				adminRequest.setName("Zafer");
-				adminRequest.setSurname("Kanbur");
-				adminRequest.setPhoneNumber("111-111-1111");
-				adminRequest.setGender(Gender.MALE);
-				adminRequest.setBirthDay(LocalDate.of(1980, 2, 2));
-				adminRequest.setBirthPlace("ISTANBUL");
 
-				userService.saveUser(adminRequest, "Admin");
+		//!!! Admin yoksa BuiltIn Admin olusturuluyor
+		if (userService.countAllAdmins() == 0) {
+			UserRequest adminRequest = new UserRequest();
+			adminRequest.setUsername("SuperAdmin"); // builtIN degeri TRUE olarak setlenmis olacak
+			adminRequest.setEmail("admin@admin.com");
+			adminRequest.setSsn("111-11-1111");
+			adminRequest.setPassword("12345678");
+			adminRequest.setName("Zafer");
+			adminRequest.setSurname("Kanbur");
+			adminRequest.setPhoneNumber("111-111-1111");
+			adminRequest.setGender(Gender.MALE);
+			adminRequest.setBirthDay(LocalDate.of(1980, 2, 2));
+			adminRequest.setBirthPlace("ISTANBUL");
 
-			}
+			userService.saveUser(adminRequest, "Admin");
+
 		}
 	}
 
-
-
-
-
-
-
-
-
-
+}

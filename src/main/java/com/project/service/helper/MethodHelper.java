@@ -1,6 +1,7 @@
 package com.project.service.helper;
 
 import com.project.entity.concretes.user.User;
+import com.project.entity.enums.RoleType;
 import com.project.exception.BadRequestException;
 import com.project.exception.ResourceNotFoundException;
 import com.project.payload.messages.ErrorMessages;
@@ -26,6 +27,14 @@ public class MethodHelper {
             throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
         }
     }
+    //!!! Rol kontrolu yapan method
+    public void checkRole(User user, RoleType roleType){
+        if(!user.getUserRole().getRoleType().equals(roleType)){
+            throw new ResourceNotFoundException(
+                    String.format(ErrorMessages.NOT_FOUND_USER_WITH_ROLE_MESSAGE, user.getId(), roleType));
+        }
+    }
+
 }
 
 
