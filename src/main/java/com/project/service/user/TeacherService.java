@@ -2,10 +2,14 @@ package com.project.service.user;
 
 import com.project.entity.concretes.user.User;
 import com.project.entity.enums.RoleType;
+import com.project.exception.ConflictException;
 import com.project.payload.mappers.UserMapper;
+import com.project.payload.messages.ErrorMessages;
 import com.project.payload.messages.SuccessMessages;
 import com.project.payload.request.user.TeacherRequest;
 import com.project.payload.response.ResponseMessage;
+import com.project.payload.response.UserResponse;
+import com.project.payload.response.user.StudentResponse;
 import com.project.payload.response.user.TeacherResponse;
 import com.project.repository.UserRepository;
 import com.project.service.UserRoleService;
@@ -15,6 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,25 +34,25 @@ public class TeacherService {
     private final PasswordEncoder passwordEncoder;
     private final MethodHelper methodHelper;
 
-    public ResponseMessage<TeacherResponse> saveTeacher(TeacherRequest teacherRequest) { //request-->response
+    public ResponseMessage<TeacherResponse> saveTeacher(TeacherRequest teacherRequest) {
         //TODO : LessonProgram eklenecek
 
         //!!! unique kontrolu
         uniquePropertyValidator.checkDuplicate(teacherRequest.getUsername(), teacherRequest.getSsn(),
                 teacherRequest.getPhoneNumber(), teacherRequest.getEmail());
 
-        //!!! DTO --> POJO
+        //!!! DTO --> POJO--dbye kayıt kısmında usera çevirmemiz gerek
         User teacher = userMapper.mapTeacherRequestToUser(teacherRequest);
 
         //!!! POJO da olmasi gerekipde DTO da olmayan verileri setliyoruz
-        teacher.setUserRole(userRoleService.getUserRole(RoleType.TEACHER));
-
+        teacher.setUserRole(userRoleService.getUserRole(RoleType.TEACHER));//rol varsa gelicek servicen yoksa hata mesajı gönderecek
         //TODO : Lessonrogram eklenecek
 
-        //!!! Password encode hashleme yaptık
+        //!!! Password encode
         teacher.setPassword(passwordEncoder.encode(teacher.getPassword()));
-        if(teacherRequest.getIsAdvisorTeacher()){
-            teacher.setIsAdvisor(Boolean.TRUE);
+
+        if (teacherRequest.getIsAdvisorTeacher()) {//requestten
+            teacher.setIsAdvisor(Boolean.TRUE);//Dbye kayıt kısmı boş kalmamalı
         } else teacher.setIsAdvisor(Boolean.FALSE);
 
         User savedTeacher = userRepository.save(teacher);
@@ -60,28 +67,60 @@ public class TeacherService {
     public ResponseMessage<TeacherResponse> updateTeacherForManagers(TeacherRequest teacherRequest, Long userId) {
         //!!! id kontrol
         User user = methodHelper.isUserExist(userId);
-
         //!!! Parametrede gelen id, bir teacher a ait mi kontrolu
         methodHelper.checkRole(user, RoleType.TEACHER);
-
         //TODO : LessonProgram eklenecek
-
         //!!! unique kontrolu
         uniquePropertyValidator.checkUniqueProperties(user, teacherRequest);
-
         //!!! DTO --> POJO
         User updatedTeacher = userMapper.mapTeacherRequestToUpdatedUser(teacherRequest, userId);
-
         //!!! Password encode
         updatedTeacher.setPassword(passwordEncoder.encode(teacherRequest.getPassword()));
 
         //TODO : LessonProgram
 
         updatedTeacher.setUserRole(userRoleService.getUserRole(RoleType.TEACHER));
+        //put mappin aldığımız için hepsini güncellememiz gerekiyor
+
         User savedTeacher = userRepository.save(updatedTeacher);
         return ResponseMessage.<TeacherResponse>builder()
                 .object(userMapper.mapUserToTeacherResponse(savedTeacher))
                 .message(SuccessMessages.TEACHER_UPDATE)
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+
+    public List<StudentResponse> getAllStudentByAdvisorUsername(String userName) {
+        //!!! user kontrolu
+        User teacher =  methodHelper.isUserExistByUsername(userName);
+        //!!! isAdvisor Kontrol
+        methodHelper.checkAdvisor(teacher);
+
+        return userRepository.findByAdvisorTeacherId(teacher.getId())
+                .stream()
+                .map(userMapper::mapUserToStudentResponse) // Stream<StudentResponse>
+                .collect(Collectors.toList());
+
+    }
+
+
+    public ResponseMessage<UserResponse> saveAdvisorTeacher(Long teacherId) {
+        //!!! id'li User var mi kontrolu
+        User teacher = methodHelper.isUserExist(teacherId);
+        //!!! id ile gelen User, Teacher mi kontrolurrorMessages.
+        methodHelper.checkRole(teacher, RoleType.TEACHER);
+        //!!! id ile gelen Teacher, zaten Advisor mi kontrolu
+        if(Boolean.TRUE.equals(teacher.getIsAdvisor())){
+            throw new ConflictException(
+                    String.format(ErrorMessages.ALREADY_EXIST_ADVISOR_MESSAGE, teacherId));
+        }
+        teacher.setIsAdvisor(Boolean.TRUE);
+        userRepository.save(teacher);
+
+        return ResponseMessage.<UserResponse>builder()
+                .message(SuccessMessages.ADVISOR_TEACHER_SAVE)
+                .object(userMapper.mapUserToUserResponse(teacher))
                 .status(HttpStatus.OK)
                 .build();
     }
