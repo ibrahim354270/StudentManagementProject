@@ -42,11 +42,25 @@ public class TeacherController {
     }
 //TODO : addLessonProgramToTeacher
 
+//Servide-set işlemi yapmadan önce DB'den verileri çekersek patch gibi çalışır.
+//ama DB'den userı çekmeden DTO-POJO dönüşümü yaparsak (set işlemi yaparsak),boş bıraktığımız yerler null olur.
+//Aslında Patch ile Put arasında fark yoktur.Kod okunabilirliği için yapıyruz.
+// Kodu yazan Kişi hangi verileri güncelleyeceğini Bilebilmesi için
+//Biz Update işlmelerinde İlk Userı çektik.Riske Atmamak için
     @PatchMapping("/saveAdvisorTeacher/{teacherId}") // http://localhost:8080/teacher/saveAdvisorTeacher/1 + PATCH
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     public ResponseMessage<UserResponse> saveAdvisorTeacher(@PathVariable Long teacherId){
         return teacherService.saveAdvisorTeacher(teacherId);
     }
-
+    @DeleteMapping("/deleteAdvisorTeacherById/{id}") // http://localhost:8080/teacher/deleteAdvisorTeacherById/1 + DELETE
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public ResponseMessage<UserResponse> deleteAdvisorTeacherById(@PathVariable Long id){
+        return teacherService.deleteAdvisorTeacherById(id);
+    }
+    @GetMapping("/getAllAdvisorTeacher")// http://localhost:8080/teacher/getAllAdvisorTeacher + GET
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public List<UserResponse> getAllAdvisorTeacher(){
+        return teacherService.getAllAdvisorTeacher();
+    }
 
 }

@@ -96,7 +96,7 @@ public class TeacherService {
         User teacher =  methodHelper.isUserExistByUsername(userName);
         //!!! isAdvisor Kontrol
         methodHelper.checkAdvisor(teacher);
-
+//AdvisorTeacherId ,student eklerken advisor ıd'side eklenecek,Teacher Id'si girerek ona ait olan öğrenci listesini görebiliriz.
         return userRepository.findByAdvisorTeacherId(teacher.getId())
                 .stream()
                 .map(userMapper::mapUserToStudentResponse) // Stream<StudentResponse>
@@ -123,5 +123,36 @@ public class TeacherService {
                 .object(userMapper.mapUserToUserResponse(teacher))
                 .status(HttpStatus.OK)
                 .build();
+    }
+            public ResponseMessage<UserResponse> deleteAdvisorTeacherById(Long teacherId) {
+
+            //!!! id var mi ?
+            User teacher = methodHelper.isUserExist(teacherId);
+            //!!! Teacher advisor mi ?
+            methodHelper.checkRole(teacher, RoleType.TEACHER); // Optional
+            methodHelper.checkAdvisor(teacher);
+            teacher.setIsAdvisor(Boolean.FALSE);
+            userRepository.save(teacher);
+
+            //!!! silinen Advisor Teacher in rehberligindeki ogrencileri ile irtibatini kopariyoruz
+            List<User> allStudents = userRepository.findByAdvisorTeacherId(teacherId);
+            if(!allStudents.isEmpty()){//liste doluysa
+                allStudents.forEach(students-> students.setAdvisorTeacherId(null));
+            }
+
+            //TODO: meet??
+            return ResponseMessage.<UserResponse>builder()
+                    .message(SuccessMessages.ADVISOR_TEACHER_DELETE)
+                    .object(userMapper.mapUserToUserResponse(teacher))
+                    .status(HttpStatus.OK)
+                    .build();
+        }
+
+    public List<UserResponse> getAllAdvisorTeacher() {
+
+        return userRepository.findAllByAdvisor(Boolean.TRUE)
+                .stream()
+                .map(userMapper::mapUserToUserResponse)
+                .collect(Collectors.toList());
     }
 }
