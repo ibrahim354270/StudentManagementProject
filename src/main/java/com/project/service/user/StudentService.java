@@ -13,6 +13,7 @@ import com.project.service.UserRoleService;
 import com.project.service.helper.MethodHelper;
 import com.project.service.validator.UniquePropertyValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -86,5 +87,41 @@ public class StudentService {
 
         String message = SuccessMessages.STUDENT_UPDATE;
         return ResponseEntity.ok(message);
+    }
+
+    public ResponseMessage<StudentResponse> updateStudentForManagers(Long userId, StudentRequest studentRequest) {
+        //!!! id var mi ??
+        User user = methodHelper.isUserExist(userId);
+        //!!! student mi ??
+        methodHelper.checkRole(user, RoleType.STUDENT);
+        //!!! unique kontrolu
+        uniquePropertyValidator.checkUniqueProperties(user, studentRequest);
+
+        User studentForUpdate = userMapper.mapStudentRequestToUpdatedUser(studentRequest, userId);
+        studentForUpdate.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
+        //TODO : AdvisorTeacherId  bilgisi gercekten Advisora mi ait
+        studentForUpdate.setAdvisorTeacherId(studentRequest.getAdvisorTeacherId());
+        studentForUpdate.setStudentNumber(user.getStudentNumber());
+        studentForUpdate.setUserRole(userRoleService.getUserRole(RoleType.STUDENT));
+        studentForUpdate.setActive(true);
+
+        return ResponseMessage.<StudentResponse>builder()
+                .object(userMapper.mapUserToStudentResponse(userRepository.save(studentForUpdate)))
+                .message(SuccessMessages.STUDENT_UPDATE)
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    public ResponseMessage changeStatusOfStudent(Long id, boolean status) {
+        User student = methodHelper.isUserExist(id);
+        methodHelper.checkRole(student,RoleType.STUDENT);
+
+        student.setActive(status); //istersek if ile statu kontrolu yapabiliriz
+        userRepository.save(student);//Merge
+
+        return ResponseMessage.builder()
+                .message("Student is " + (status ? "active" : "passive"))
+                .status(HttpStatus.OK)
+                .build();
     }
 }

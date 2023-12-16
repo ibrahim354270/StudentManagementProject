@@ -156,6 +156,11 @@ public class UserMapper {
                 .build();
 
     }
+    public User mapStudentRequestToUpdatedUser(StudentRequest studentRequest, Long userId) {
+        User student = mapStudentRequestToUser(studentRequest);
+        student.setId(userId);
+        return student;
+    }
 }
 
 //abstract yerine interface kullansaydikda yine interface date type
