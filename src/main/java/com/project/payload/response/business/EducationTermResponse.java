@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class EducationTermResponse {
+public class EducationTermResponse {//education diğerleri ile ortak değişknleri yok o yüzden extend yapmadık.
 
     private Long id;
     private Term term;
