@@ -10,9 +10,15 @@ import com.project.payload.request.business.LessonRequest;
 import com.project.payload.response.ResponseMessage;
 import com.project.payload.response.business.LessonResponse;
 import com.project.repository.business.LessonRepository;
+import com.project.service.helper.PageableHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +26,7 @@ public class LessonService {
 
     private final LessonRepository lessonRepository;
     private final LessonMapper lessonMapper;
+    private final PageableHelper pageableHelper;
 
     public ResponseMessage<LessonResponse> saveLesson(LessonRequest lessonRequest) {
 
@@ -63,4 +70,59 @@ public class LessonService {
         return lessonRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_WITH_ID_MESSAGE,id)));
     }
+    public ResponseMessage<LessonResponse> getLessonByLessonName(String lessonName) {
+        if(lessonRepository.getLessonByLessonName(lessonName).isPresent()) {//null değilse içi doluysa
+            return ResponseMessage.<LessonResponse>builder()
+                    .message(SuccessMessages.LESSON_FOUND)
+                    .object(lessonMapper.mapLessonToLessonResponse(
+                            lessonRepository.getLessonByLessonName(lessonName).get()))//optional yapının içerisindeki var olan bilgiyi çekmek için get()
+                    .build();
+        } else {
+            return ResponseMessage.<LessonResponse>builder()//orElseThrow() bestpractice
+                    .message(String.format(ErrorMessages.NOT_FOUND_LESSON_WITH_LESSON_NAME, lessonName))
+                    .status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
+    }
+
+    public Page<LessonResponse> findLessonByPage(int page, int size, String sort, String type) {
+       Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+        return lessonRepository.findAll(pageable).map(lessonMapper::mapLessonToLessonResponse);
+    }
+
+
+    public Set<Lesson> getAllLessonByLessonId(Set<Long> idSet) { // 2;4;6
+        return idSet.stream()
+                .map(this::isLessonExistById)
+                .collect(Collectors.toSet());
+    }
+
+    public LessonResponse updateLessonById(Long lessonId, LessonRequest lessonRequest) {
+        Lesson lesson = isLessonExistById(lessonId); //db den aldığımız nullsafe
+
+        if(
+                !(lesson.getLessonName().equals(lessonRequest.getLessonName())) &&
+                        (lessonRepository.existsLessonByLessonNameEqualsIgnoreCase(lessonRequest.getLessonName()))
+        ){
+            throw new ConflictException(
+                    String.format(ErrorMessages.ALREADY_EXIST_LESSON_WITH_LESSON_NAME_MESSAGE, lessonRequest.getLessonName()));
+        }
+
+//        lesson.setLessonName(lessonRequest.getLessonName());
+//        lesson.setCreditScore(lessonRequest.getCreditScore());
+//        lesson.setIsCompulsory(lessonRequest.getIsCompulsory());
+
+        Lesson updatedLesson = lessonMapper.mapLessonRequestToUpdatedLesson(lessonId, lessonRequest);
+        updatedLesson.setLessonPrograms(lesson.getLessonPrograms());//request -> pojo burda değişiklik yaptığımızda hepsini
+        //set yapmazsak setlenmeyen değerler null olur.
+
+        Lesson savedLesson =  lessonRepository.save(updatedLesson);
+        //Lesson savedLesson =  lessonRepository.save(lesson);
+
+
+        return lessonMapper.mapLessonToLessonResponse(savedLesson);
+
+    }
 }
+
+

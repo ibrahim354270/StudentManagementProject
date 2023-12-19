@@ -31,7 +31,7 @@ public class EducationTermMapper {
     }
     public EducationTerm mapEducationTermRequestToUpdatedEducationTerm(Long id, EducationTermRequest educationTermRequest) {
         return mapEducationTermRequestToEducationTerm(educationTermRequest)
-                .toBuilder()
+                .toBuilder()//yukarıda ki 1.map deki işlemi clone yaptık.tobuilder sayesinde .sadece üstüne ıd bilgisini ekledik. (aynı bilgileri tekrar yazmadk)
                 .id(id)
                 .build();
     }

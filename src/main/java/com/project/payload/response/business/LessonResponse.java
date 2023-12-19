@@ -14,7 +14,7 @@ public class LessonResponse {
     private Long lessonId;
     private String lessonName;
     private int creditScore;
-    private boolean isCompulsory;
+    private boolean isCompulsory;//zorunlu ders mi?
 
 
 }
