@@ -47,7 +47,7 @@ public class LessonController {
             @RequestParam(value = "type") String type)
     {
         return lessonService.findLessonByPage(page,size,sort,type);
-    }
+    }//page yapıda bir yapı göndermek istiyorsak.Data JPA pageable ı tanıyor o şekilde bize gönderiyor
     @GetMapping("/getAllLessonByLessonId")// http://localhost:8080/lessons/getAllLessonByLessonId?lessonId=1,2,3 + GET
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     public Set<Lesson> getAllLessonByLessonId(@RequestParam(name = "lessonId") Set<Long> idSet){

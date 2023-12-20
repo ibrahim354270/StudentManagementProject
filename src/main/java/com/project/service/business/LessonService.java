@@ -71,6 +71,13 @@ public class LessonService {
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_WITH_ID_MESSAGE,id)));
     }
     public ResponseMessage<LessonResponse> getLessonByLessonName(String lessonName) {
+
+//        Lesson lesson=lessonRepository.getLessonByLessonName(lessonName).orElseThrow(()->new ResourceNotFoundException (ErrorMessages.NOT_FOUND_LESSON_WITH_LESSON_NAME));
+//        return ResponseMessage.<LessonResponse>builder().
+//                object(lessonMapper.mapLessonToLessonResponse(lesson)).
+//                message(SuccessMessages.LESSON_FOUND).
+//                status(HttpStatus.OK).build();
+
         if(lessonRepository.getLessonByLessonName(lessonName).isPresent()) {//null değilse içi doluysa
             return ResponseMessage.<LessonResponse>builder()
                     .message(SuccessMessages.LESSON_FOUND)
@@ -92,6 +99,7 @@ public class LessonService {
 
 
     public Set<Lesson> getAllLessonByLessonId(Set<Long> idSet) { // 2;4;6
+        //bulunduğu class içinde olduğu için this keyword kullandık
         return idSet.stream()
                 .map(this::isLessonExistById)
                 .collect(Collectors.toSet());

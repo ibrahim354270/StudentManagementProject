@@ -10,6 +10,7 @@ import java.time.LocalTime;
 public class DateTimeValidator {
 
     public boolean checkTime(LocalTime start, LocalTime stop){
+
         return start.isAfter(stop) || start.equals(stop);
     }
 
