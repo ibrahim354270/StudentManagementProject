@@ -13,6 +13,9 @@ import java.util.Set;
 @Data
 @Component
 public class LessonProgramMapper {
+    //LessonProgramRequest içinde lesson, educationterm bilgileri Id şeklinde var
+    // ama POJO dönüşümü için bize tüm entity lesson educationterm gerekiyor.
+    //servis katmanında zaten biz ID ile lesson ,educationterm getirmiştik bunları paramatre içine koyuyoruz.
 
     //!!! DTO --> POJO
     public LessonProgram mapLessonProgramRequestToLessonProgram(LessonProgramRequest lessonProgramRequest,

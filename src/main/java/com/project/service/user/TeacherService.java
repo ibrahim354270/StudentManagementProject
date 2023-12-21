@@ -98,7 +98,7 @@ public class TeacherService {
 
     public List<StudentResponse> getAllStudentByAdvisorUsername(String userName) {
         //!!! user kontrolu
-        User teacher =  methodHelper.isUserExistByUsername(userName);
+        User teacher = methodHelper.isUserExistByUsername(userName);
         //!!! isAdvisor Kontrol
         methodHelper.checkAdvisor(teacher);
 //AdvisorTeacherId ,student eklerken advisor ıd'side eklenecek,Teacher Id'si girerek ona ait olan öğrenci listesini görebiliriz.
@@ -116,7 +116,7 @@ public class TeacherService {
         //!!! id ile gelen User, Teacher mi kontrolurrorMessages.
         methodHelper.checkRole(teacher, RoleType.TEACHER);
         //!!! id ile gelen Teacher, zaten Advisor mi kontrolu
-        if(Boolean.TRUE.equals(teacher.getIsAdvisor())){
+        if (Boolean.TRUE.equals(teacher.getIsAdvisor())) {
             throw new ConflictException(
                     String.format(ErrorMessages.ALREADY_EXIST_ADVISOR_MESSAGE, teacherId));
         }
@@ -129,29 +129,30 @@ public class TeacherService {
                 .status(HttpStatus.OK)
                 .build();
     }
-            public ResponseMessage<UserResponse> deleteAdvisorTeacherById(Long teacherId) {
 
-            //!!! id var mi ?
-            User teacher = methodHelper.isUserExist(teacherId);
-            //!!! Teacher advisor mi ?
-            methodHelper.checkRole(teacher, RoleType.TEACHER); // Optional
-            methodHelper.checkAdvisor(teacher);
-            teacher.setIsAdvisor(Boolean.FALSE);
-            userRepository.save(teacher);
+    public ResponseMessage<UserResponse> deleteAdvisorTeacherById(Long teacherId) {
 
-            //!!! silinen Advisor Teacher in rehberligindeki ogrencileri ile irtibatini kopariyoruz
-            List<User> allStudents = userRepository.findByAdvisorTeacherId(teacherId);
-            if(!allStudents.isEmpty()){//liste doluysa
-                allStudents.forEach(students-> students.setAdvisorTeacherId(null));
-            }
+        //!!! id var mi ?
+        User teacher = methodHelper.isUserExist(teacherId);
+        //!!! Teacher advisor mi ?
+        methodHelper.checkRole(teacher, RoleType.TEACHER); // Optional
+        methodHelper.checkAdvisor(teacher);
+        teacher.setIsAdvisor(Boolean.FALSE);
+        userRepository.save(teacher);
 
-            //TODO: meet??
-            return ResponseMessage.<UserResponse>builder()
-                    .message(SuccessMessages.ADVISOR_TEACHER_DELETE)
-                    .object(userMapper.mapUserToUserResponse(teacher))
-                    .status(HttpStatus.OK)
-                    .build();
+        //!!! silinen Advisor Teacher in rehberligindeki ogrencileri ile irtibatini kopariyoruz
+        List<User> allStudents = userRepository.findByAdvisorTeacherId(teacherId);
+        if (!allStudents.isEmpty()) {//liste doluysa
+            allStudents.forEach(students -> students.setAdvisorTeacherId(null));
         }
+
+        //TODO: meet??
+        return ResponseMessage.<UserResponse>builder()
+                .message(SuccessMessages.ADVISOR_TEACHER_DELETE)
+                .object(userMapper.mapUserToUserResponse(teacher))
+                .status(HttpStatus.OK)
+                .build();
+    }
 
     public List<UserResponse> getAllAdvisorTeacher() {
 
@@ -172,6 +173,7 @@ public class TeacherService {
         //teacher in mevcuttaki lesson programları getirildi
         Set<LessonProgram> teachersLessonProgram = teacher.getLessonProgramList();
         //TODO ODEV  : cakisma kontrolu
+        lessonConflict(lessonPrograms,teachersLessonProgram);
         teachersLessonProgram.addAll(lessonPrograms);//ekleme yaptık
         teacher.setLessonProgramList(teachersLessonProgram);
 
@@ -183,4 +185,49 @@ public class TeacherService {
                 .object(userMapper.mapUserToTeacherResponse(updatedTeacher))
                 .build();
     }
+
+
+
+    public  void lessonConflict(Set<LessonProgram> request, Set<LessonProgram> dB) {
+        for (LessonProgram requestProgram : request) {
+            for (LessonProgram dbProgram : dB) {
+                // Aynı term mü?
+                boolean sameTerm = requestProgram.getEducationTerm().equals(dbProgram.getEducationTerm());
+                // Aynı gün mü?
+                boolean sameDay = requestProgram.getDay().equals(dbProgram.getDay());
+                // Start ve stop time eşit mi?
+                boolean equalSST = requestProgram.getStartTime().equals(dbProgram.getStartTime())
+                        && requestProgram.getStopTime().equals(dbProgram.getStopTime());
+                // Start ve stopT arasında mı?
+                boolean betweenSST = requestProgram.getStartTime().isAfter(dbProgram.getStartTime())
+                        && requestProgram.getStopTime().isBefore(dbProgram.getStopTime());
+
+                // Aynı term içine ve aynı günde ise
+                if (sameTerm && sameDay && (equalSST || betweenSST)) {
+                    throw new ConflictException(ErrorMessages.LESSON_PROGRAM_CONFLICT_MESSAGE);
+                }
+            }
+        }
+    }
 }
+
+//    public void lessonConflict(LessonProgram request, LessonProgram dB) {
+//        //aynı term mü?
+//        boolean sameTerm=request.getEducationTerm().equals(dB.getEducationTerm());
+//        //aynı gün mü?
+//        boolean sameDay=request.getDay().equals(dB.getDay());
+//        //start ve stop time eşit mi
+//        boolean equalSST=request.getStartTime().equals(dB.getStartTime())
+//                & request.getStopTime().equals(dB.getStopTime());
+//        //Start ve stopT arasında mı
+//        boolean betweenSST=request.getStartTime().isAfter(dB.getStartTime())
+//                & request.getStopTime().isBefore(dB.getStopTime());
+//
+//        // aynı term içine ve aynı Günde ise
+//        if (sameTerm & sameDay & (equalSST || betweenSST))  {
+//
+//            throw new ConflictException(ErrorMessages.LESSON_PROGRAM_CONFLICT_MESSAGE);
+//        }
+//
+//    }
+

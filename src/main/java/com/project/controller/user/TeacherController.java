@@ -62,6 +62,7 @@ public class TeacherController {
     public List<UserResponse> getAllAdvisorTeacher(){
         return teacherService.getAllAdvisorTeacher();
     }
+    //teacher a ders programı ekleme
     @PostMapping("/addLessonProgram")// http://localhost:8080/teacher/addLessonProgram  + POST + JSON
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     public ResponseMessage<TeacherResponse> chooseLesson(@RequestBody @Valid

@@ -3,6 +3,8 @@ package com.project.service.business;
 import com.project.entity.concretes.business.EducationTerm;
 import com.project.entity.concretes.business.Lesson;
 import com.project.entity.concretes.business.LessonProgram;
+import com.project.entity.concretes.user.User;
+import com.project.entity.enums.RoleType;
 import com.project.exception.ResourceNotFoundException;
 import com.project.payload.mappers.LessonProgramMapper;
 import com.project.payload.messages.ErrorMessages;
@@ -12,7 +14,10 @@ import com.project.payload.response.ResponseMessage;
 import com.project.payload.response.business.LessonProgramResponse;
 import com.project.repository.business.LessonProgramRepository;
 import com.project.repository.business.LessonRepository;
+import com.project.service.helper.MethodHelper;
 import com.project.service.helper.PageableHelper;
+import com.project.service.user.StudentService;
+import com.project.service.user.TeacherService;
 import com.project.service.validator.DateTimeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +40,7 @@ public class LessonProgramService {
     private final DateTimeValidator dateTimeValidator;
     private final LessonProgramMapper lessonProgramMapper;
     private final PageableHelper pageableHelper;
+    private final MethodHelper methodHelper;
 
     public ResponseMessage<LessonProgramResponse> saveLessonProgram(LessonProgramRequest lessonProgramRequest) {
         Set<Lesson> lessons =  lessonService.getAllLessonByLessonId(lessonProgramRequest.getLessonIdList());
@@ -46,7 +52,7 @@ public class LessonProgramService {
             throw new ResourceNotFoundException(ErrorMessages.NOT_FOUND_LESSON_IN_LIST);
         }
 
-        //!!!  zaman kontrolu
+        //!!! zaman kontrolu
         dateTimeValidator.checkTimeWithException(lessonProgramRequest.getStartTime(),
                 lessonProgramRequest.getStopTime());
 
@@ -80,7 +86,9 @@ public class LessonProgramService {
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE,id)));
     }
 
+    //atanmayan derken yani tabloda user kısmı boş
     public List<LessonProgramResponse> getAllUnassigned() {
+        // bu yöntemle null olan farklı entity türlerini Id'lerini komtrol edebiliriz
         return lessonProgramRepository.findByUsers_IdNull()
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
@@ -88,7 +96,7 @@ public class LessonProgramService {
     }
 
     public List<LessonProgramResponse> getAllAssigned() {
-
+        //tabloda user kolonunda id özelliği olan lesson programları getir
         return lessonProgramRepository.findByUsers_IdNotNull()
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
@@ -126,5 +134,27 @@ public class LessonProgramService {
 
         return lessonPrograms;
     }
+    public Set<LessonProgramResponse> getLessonProgramsByTeacherId(Long teacherId) {
+        //böyle bir user varmı
+        User teacher = methodHelper.isUserExist(teacherId);
+        //var ise teacher mı
+        methodHelper.checkRole(teacher, RoleType.TEACHER);
 
+        Set<LessonProgram> lessonProgramSet=lessonProgramRepository.getLessonProgramByUserId(teacherId);
+        return lessonProgramSet.stream().
+                map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
+                collect(Collectors.toSet());
+
+    }
+    public Set<LessonProgramResponse> getLessonProgramsByStudentId(Long studentId) {
+        User student= methodHelper.isUserExist(studentId);
+
+        methodHelper.checkRole(student,RoleType.STUDENT);
+
+        Set<LessonProgram> lessonProgramSet= lessonProgramRepository.getLessonProgramByUserId(studentId);
+        return lessonProgramSet.stream().
+                map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
+                collect(Collectors.toSet());
+
+}
 }

@@ -84,8 +84,17 @@ public class LessonProgramController {
         return lessonProgramService.getAllLessonProgramByUser(httpServletRequest);
     }
 
-        // Not: ( ODEV ) getLessonProgramsByTeacherId() ******
-
+    // Not: ( ODEV ) getLessonProgramsByTeacherId() ******
+    @GetMapping("/getLessonProgramsByTeacherId/{teacherId}") //http://localhost:8080/lessonPrograms/getLessonProgramsByTeacherId/1 +GET
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public Set<LessonProgramResponse> getLessonProgramsByTeacherId(@PathVariable Long teacherId){
+        return lessonProgramService.getLessonProgramsByTeacherId(teacherId);
+    }
     // Not : ( ODEV ) getLessonProgramsByStudentId() *****
+    @GetMapping("/getLessonProgramsByStudentId()/{studentId}") //http://localhost:8080/lessonPrograms/getLessonProgramsByStudentId/1 +GET
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public Set<LessonProgramResponse> getLessonProgramsByStudentId(@PathVariable Long studentId){
+        return lessonProgramService.getLessonProgramsByStudentId(studentId);
+    }
 
 }
