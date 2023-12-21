@@ -30,6 +30,7 @@ public class SuccessMessages {
     public static final String LESSON_PROGRAM_SAVE = "Lesson Program is saved Successfully";
     public static final String LESSON_PROGRAM_DELETE = "Lesson Program is deleted Successfully";
     public static final String LESSON_PROGRAM_ADD_TO_TEACHER = "Lesson Program added to teacher";
+    public static final String LESSON_PROGRAM_ADD_TO_STUDENT = "Lesson Program added to student";
 
 
 }

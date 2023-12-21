@@ -1,5 +1,6 @@
 package com.project.controller.user;
 
+import com.project.payload.request.business.ChooseLessonProgramWithId;
 import com.project.payload.request.user.StudentRequest;
 import com.project.payload.request.user.StudentRequestWithoutPassword;
 import com.project.payload.response.ResponseMessage;
@@ -41,7 +42,14 @@ public class StudentController {
                                                                      @RequestBody @Valid StudentRequest studentRequest ){
         return studentService.updateStudentForManagers(userId,studentRequest);
     }
-    //TODO: LessonProgram Ekleme
+    //Ogrenci kendine LessonProgram ekliyor
+    @PostMapping("/addLessonProgramToStudent")// http://localhost:8080/students/addLessonProgramToStudent + POST + JSON
+    @PreAuthorize("hasAnyAuthority('STUDENT')")
+    public ResponseMessage<StudentResponse> addLessonProgram(HttpServletRequest request,
+                                                             @RequestBody @Valid ChooseLessonProgramWithId chooseLessonProgramWithId){
+        String userName = (String) request.getAttribute("username");
+        return studentService.addLessonProgramToStudent(userName, chooseLessonProgramWithId);
+    }
 
     @GetMapping("/changeStatus") // http://localhost:8080/students/changeStatus?id=1&status=true + GET
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")

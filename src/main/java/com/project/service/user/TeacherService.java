@@ -17,6 +17,7 @@ import com.project.repository.UserRepository;
 import com.project.service.UserRoleService;
 import com.project.service.business.LessonProgramService;
 import com.project.service.helper.MethodHelper;
+import com.project.service.validator.DateTimeValidator;
 import com.project.service.validator.UniquePropertyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,9 +39,11 @@ public class TeacherService {
     private final PasswordEncoder passwordEncoder;
     private final MethodHelper methodHelper;
     private final LessonProgramService lessonProgramService;
+    private final DateTimeValidator dateTimeValidator;
 
     public ResponseMessage<TeacherResponse> saveTeacher(TeacherRequest teacherRequest) {
-        //TODO : LessonProgram eklenecek
+        Set<LessonProgram> lessonProgramSet =
+                lessonProgramService.getLessonProgramById(teacherRequest.getLessonIdList());
 
         //!!! unique kontrolu
         uniquePropertyValidator.checkDuplicate(teacherRequest.getUsername(), teacherRequest.getSsn(),
@@ -51,7 +54,7 @@ public class TeacherService {
 
         //!!! POJO da olmasi gerekipde DTO da olmayan verileri setliyoruz
         teacher.setUserRole(userRoleService.getUserRole(RoleType.TEACHER));//rol varsa gelicek servicen yoksa hata mesajı gönderecek
-        //TODO : Lessonrogram eklenecek
+        teacher.setLessonProgramList(lessonProgramSet);
 
         //!!! Password encode
         teacher.setPassword(passwordEncoder.encode(teacher.getPassword()));
@@ -74,7 +77,8 @@ public class TeacherService {
         User user = methodHelper.isUserExist(userId);
         //!!! Parametrede gelen id, bir teacher a ait mi kontrolu
         methodHelper.checkRole(user, RoleType.TEACHER);
-        //TODO : LessonProgram eklenecek
+        Set<LessonProgram> lessonPrograms =
+                lessonProgramService.getLessonProgramById(teacherRequest.getLessonIdList());
         //!!! unique kontrolu
         uniquePropertyValidator.checkUniqueProperties(user, teacherRequest);
         //!!! DTO --> POJO
@@ -82,7 +86,7 @@ public class TeacherService {
         //!!! Password encode
         updatedTeacher.setPassword(passwordEncoder.encode(teacherRequest.getPassword()));
 
-        //TODO : LessonProgram
+        updatedTeacher.setLessonProgramList(lessonPrograms);
 
         updatedTeacher.setUserRole(userRoleService.getUserRole(RoleType.TEACHER));
         //put mappin aldığımız için hepsini güncellememiz gerekiyor
@@ -173,7 +177,8 @@ public class TeacherService {
         //teacher in mevcuttaki lesson programları getirildi
         Set<LessonProgram> teachersLessonProgram = teacher.getLessonProgramList();
         //TODO ODEV  : cakisma kontrolu
-        lessonConflict(lessonPrograms,teachersLessonProgram);
+        dateTimeValidator.checkLessonPrograms(teachersLessonProgram, lessonPrograms);
+       // **lessonConflict(lessonPrograms,teachersLessonProgram);
         teachersLessonProgram.addAll(lessonPrograms);//ekleme yaptık
         teacher.setLessonProgramList(teachersLessonProgram);
 
@@ -188,28 +193,28 @@ public class TeacherService {
 
 
 
-    public  void lessonConflict(Set<LessonProgram> request, Set<LessonProgram> dB) {
-        for (LessonProgram requestProgram : request) {
-            for (LessonProgram dbProgram : dB) {
-                // Aynı term mü?
-                boolean sameTerm = requestProgram.getEducationTerm().equals(dbProgram.getEducationTerm());
-                // Aynı gün mü?
-                boolean sameDay = requestProgram.getDay().equals(dbProgram.getDay());
-                // Start ve stop time eşit mi?
-                boolean equalSST = requestProgram.getStartTime().equals(dbProgram.getStartTime())
-                        && requestProgram.getStopTime().equals(dbProgram.getStopTime());
-                // Start ve stopT arasında mı?
-                boolean betweenSST = requestProgram.getStartTime().isAfter(dbProgram.getStartTime())
-                        && requestProgram.getStopTime().isBefore(dbProgram.getStopTime());
-
-                // Aynı term içine ve aynı günde ise
-                if (sameTerm && sameDay && (equalSST || betweenSST)) {
-                    throw new ConflictException(ErrorMessages.LESSON_PROGRAM_CONFLICT_MESSAGE);
-                }
-            }
-        }
-    }
-}
+//  *  public  void lessonConflict(Set<LessonProgram> request, Set<LessonProgram> dB) {
+//        for (LessonProgram requestProgram : request) {
+//            for (LessonProgram dbProgram : dB) {
+//                // Aynı term mü?
+//                boolean sameTerm = requestProgram.getEducationTerm().equals(dbProgram.getEducationTerm());
+//                // Aynı gün mü?
+//                boolean sameDay = requestProgram.getDay().equals(dbProgram.getDay());
+//                // Start ve stop time eşit mi?
+//                boolean equalSST = requestProgram.getStartTime().equals(dbProgram.getStartTime())
+//                        && requestProgram.getStopTime().equals(dbProgram.getStopTime());
+//                // Start ve stopT arasında mı?
+//                boolean betweenSST = requestProgram.getStartTime().isAfter(dbProgram.getStartTime())
+//                        && requestProgram.getStopTime().isBefore(dbProgram.getStopTime());
+//
+//                // Aynı term içine ve aynı günde ise
+//                if (sameTerm && sameDay && (equalSST || betweenSST)) {
+//                    throw new ConflictException(ErrorMessages.LESSON_PROGRAM_CONFLICT_MESSAGE);
+//                }
+//            }
+//        }
+//    }
+//}
 
 //    public void lessonConflict(LessonProgram request, LessonProgram dB) {
 //        //aynı term mü?
@@ -228,6 +233,6 @@ public class TeacherService {
 //
 //            throw new ConflictException(ErrorMessages.LESSON_PROGRAM_CONFLICT_MESSAGE);
 //        }
-//
-//    }
+//*
+}
 
