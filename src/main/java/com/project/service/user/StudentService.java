@@ -155,6 +155,7 @@ public class StudentService {
         //!!! mevcuttaki LP ile istekten gelen LP ler arasi cakisma var mi
         Set<LessonProgram> studentCurrentLessonProgram = student.getLessonProgramList();
         dateTimeValidator.checkLessonPrograms(studentCurrentLessonProgram,lessonProgramSet);
+        //mevctutta ki ders programına ekleme yapıyor.
         studentCurrentLessonProgram.addAll(lessonProgramSet);
         student.setLessonProgramList(studentCurrentLessonProgram);
 

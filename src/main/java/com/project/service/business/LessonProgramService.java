@@ -144,7 +144,32 @@ public class LessonProgramService {
         return lessonProgramSet.stream().
                 map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
                 collect(Collectors.toSet());
+/*
+ public Set<LessonProgramResponse> getLessonProgramsByTeacherId(Long teacherId) {
+        //böyle bir user varmı
+        User teacher = methodHelper.isUserExist(teacherId);
 
+        //var ise teacher mı
+        methodHelper.checkRole(teacher, RoleType.TEACHER);
+
+       Set<LessonProgram> lessonProgramSet=lessonProgramRepository.getLessonProgramByUserId(teacherId);
+       return lessonProgramSet.stream().
+               map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
+               collect(Collectors.toSet());
+       /*
+         return lessonProgramRepository.findByUsers_IdEquals(teacherId) // Derived
+                .stream()
+                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+                .collect(Collectors.toSet());
+        */
+
+    /*username methodumuz vardı o şekilde de yapabiliriz.
+        return lessonProgramRepository.getLessonProgramByUsersUserName(teacher.getUsername())
+        .stream()
+        .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+        .collect(Collectors.toSet());
+ }
+ */
     }
     public Set<LessonProgramResponse> getLessonProgramsByStudentId(Long studentId) {
         User student= methodHelper.isUserExist(studentId);

@@ -82,6 +82,7 @@ public class DateTimeValidator {
     }
     public void checkLessonPrograms(Set<LessonProgram> existLessonProgram,
                                     Set<LessonProgram> lessonProgramRequest){
+        //Eğer Db'de LessonProgram tablosu boş ise onu kontrol etmeye gerek yok
         if(existLessonProgram.isEmpty() && lessonProgramRequest.size() > 1){
             checkDuplicateLessonPrograms(lessonProgramRequest);
         } else {
