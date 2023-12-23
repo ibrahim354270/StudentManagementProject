@@ -201,8 +201,17 @@ public class UserService {
                 .collect(Collectors.toList());
     }
     public long countAllAdmins() {
+
         return userRepository.countAdmin(RoleType.ADMIN); //JPQL
     }
+    public User getUserByUserId(Long userId){
+        return userRepository.findById(userId).orElseThrow(()->
+                new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE,userId)));
+    }
+    public List<User> getStudentById(Long[] studentIds){
+        return userRepository.findByIdsEquals(studentIds);
+    }
+
 }
 
 

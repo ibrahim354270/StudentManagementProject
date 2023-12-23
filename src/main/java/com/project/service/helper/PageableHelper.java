@@ -18,5 +18,8 @@ public class PageableHelper {
 
         return pageable;
     }
+    public Pageable getPageableWithProperties(int page, int size){//üstteki gibi aynı işlem ama sortlama kısmını kendimiz setledik
+        return PageRequest.of(page, size,Sort.by("id").descending());
+    }
 }
 

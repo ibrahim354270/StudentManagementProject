@@ -42,8 +42,12 @@ public class ErrorMessages {
     public static final String NOT_FOUND_LESSON_PROGRAM_MESSAGE_WITHOUT_ID_LIST = "Error: Lesson program with this field not found ";
     public static final String LESSON_PROGRAM_ALREADY_EXIST = "Error: Course schedule can not be selected for the same hour and date";
 
-    public static final String LESSON_PROGRAM_CONFLICT_MESSAGE = "Error: There is a conflict regarding the dates,the time,the terms of the lesson program";
+   //* public static final String LESSON_PROGRAM_CONFLICT_MESSAGE = "Error: There is a conflict regarding the dates,the time,the terms of the lesson program";
 
     public static final String STUDENT_INFO_NOT_FOUND = "Error: Student Info with id : %d not found";
+
+
+    public static final String MEET_HOURS_CONFLICT = "Error: Meet hours has conflict with existing meets";
+
 
 }
