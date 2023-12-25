@@ -84,6 +84,9 @@ public class WebSecurityConfig {
     }
 
     private static final String[] AUTH_WHITE_LIST = { //security den muaf tutulanlar
+            "/v3/api-docs/**", // eklenecek
+            "swagger-ui.html", // eklenecek
+            "/swagger-ui/**", // eklenecek
             "/", // localhost a herhangi bir kullanıcı girebilsin
             "/index.html",
             "/images/**",
@@ -91,6 +94,7 @@ public class WebSecurityConfig {
             "/js?/**",
             "/contactMessages/save",
             "/auth/login"
+
 
     };
 }

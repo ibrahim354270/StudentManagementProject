@@ -35,7 +35,7 @@ public class TeacherController {
         return teacherService.updateTeacherForManagers(teacherRequest,userId);
     }
     //!!! Bir rehber ogretmenin rehberligindeki ogrencilerinin tamamini getiren method
-    @GetMapping("/getAllStudentByAdvisorUsername")
+    @GetMapping("/getAllStudentByAdvisorUsername")//localhost:8080/teacher/getAllStudentByAdvisorUsername
     @PreAuthorize("hasAnyAuthority('TEACHER')")
     public List<StudentResponse> getAllStudentByAdvisorUsername(HttpServletRequest request){
         String userName = request.getHeader("username");//getAttribute ile aynı işlem-casting e gerek kalmıyor

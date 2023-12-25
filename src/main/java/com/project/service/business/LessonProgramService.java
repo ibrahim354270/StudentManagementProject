@@ -16,8 +16,6 @@ import com.project.repository.business.LessonProgramRepository;
 import com.project.repository.business.LessonRepository;
 import com.project.service.helper.MethodHelper;
 import com.project.service.helper.PageableHelper;
-import com.project.service.user.StudentService;
-import com.project.service.user.TeacherService;
 import com.project.service.validator.DateTimeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -52,7 +50,7 @@ public class LessonProgramService {
             throw new ResourceNotFoundException(ErrorMessages.NOT_FOUND_LESSON_IN_LIST);
         }
 
-        //!!! zaman kontrolu
+        //!!!  zaman kontrolu
         dateTimeValidator.checkTimeWithException(lessonProgramRequest.getStartTime(),
                 lessonProgramRequest.getStopTime());
 
@@ -86,9 +84,7 @@ public class LessonProgramService {
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE,id)));
     }
 
-    //atanmayan derken yani tabloda user kısmı boş
     public List<LessonProgramResponse> getAllUnassigned() {
-        // bu yöntemle null olan farklı entity türlerini Id'lerini komtrol edebiliriz
         return lessonProgramRepository.findByUsers_IdNull()
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
@@ -96,12 +92,13 @@ public class LessonProgramService {
     }
 
     public List<LessonProgramResponse> getAllAssigned() {
-        //tabloda user kolonunda id özelliği olan lesson programları getir
+
         return lessonProgramRepository.findByUsers_IdNotNull()
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toList());
     }
+
     public ResponseMessage deleteLessonProgramById(Long id) {
         isLessonProgramExistById(id);
         lessonProgramRepository.deleteById(id);
@@ -111,11 +108,13 @@ public class LessonProgramService {
                 .status(HttpStatus.OK)
                 .build();
     }
+
     public Page<LessonProgramResponse> getAllLessonProgramWithPage(int page, int size, String sort, String type) {
         Pageable pageable =  pageableHelper.getPageableWithProperties(page, size, sort, type);
         return lessonProgramRepository.findAll(pageable)
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse);
     }
+
     public Set<LessonProgramResponse> getAllLessonProgramByUser(HttpServletRequest httpServletRequest) {
         String userName = (String) httpServletRequest.getAttribute("username");
 
@@ -124,6 +123,7 @@ public class LessonProgramService {
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toSet());
     }
+
     //!!! TeacherService icin yazildi
     public Set<LessonProgram> getLessonProgramById(Set<Long> lessonIdSet){
         Set<LessonProgram> lessonPrograms = lessonProgramRepository.getLessonProgramByLessonProgramIdList(lessonIdSet);
@@ -134,52 +134,24 @@ public class LessonProgramService {
 
         return lessonPrograms;
     }
-    public Set<LessonProgramResponse> getLessonProgramsByTeacherId(Long teacherId) {
-        //böyle bir user varmı
+
+    public Set<LessonProgramResponse> getByTeacherId(Long teacherId) {
         User teacher = methodHelper.isUserExist(teacherId);
-        //var ise teacher mı
         methodHelper.checkRole(teacher, RoleType.TEACHER);
 
-        Set<LessonProgram> lessonProgramSet=lessonProgramRepository.getLessonProgramByUserId(teacherId);
-        return lessonProgramSet.stream().
-                map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
-                collect(Collectors.toSet());
-/*
- public Set<LessonProgramResponse> getLessonProgramsByTeacherId(Long teacherId) {
-        //böyle bir user varmı
-        User teacher = methodHelper.isUserExist(teacherId);
-
-        //var ise teacher mı
-        methodHelper.checkRole(teacher, RoleType.TEACHER);
-
-       Set<LessonProgram> lessonProgramSet=lessonProgramRepository.getLessonProgramByUserId(teacherId);
-       return lessonProgramSet.stream().
-               map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
-               collect(Collectors.toSet());
-       /*
-         return lessonProgramRepository.findByUsers_IdEquals(teacherId) // Derived
+        return lessonProgramRepository.findByUsers_IdEquals(teacherId) // Derived
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toSet());
-        */
-
-    /*username methodumuz vardı o şekilde de yapabiliriz.
-        return lessonProgramRepository.getLessonProgramByUsersUserName(teacher.getUsername())
-        .stream()
-        .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
-        .collect(Collectors.toSet());
- }
- */
     }
-    public Set<LessonProgramResponse> getLessonProgramsByStudentId(Long studentId) {
-        User student= methodHelper.isUserExist(studentId);
 
+    public Set<LessonProgramResponse> getByStudentId(Long studentId) {
+        User student = methodHelper.isUserExist(studentId);
         methodHelper.checkRole(student,RoleType.STUDENT);
 
-        Set<LessonProgram> lessonProgramSet= lessonProgramRepository.getLessonProgramByUserId(studentId);
-        return lessonProgramSet.stream().
-                map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
-                collect(Collectors.toSet());
-
-}
+        return lessonProgramRepository.findByUsers_IdEquals(studentId)// yukarda yazilan
+                .stream()
+                .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+                .collect(Collectors.toSet());
+    }
 }
