@@ -84,15 +84,16 @@ public class LessonProgramService {
                 new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE,id)));
     }
 
-    public List<LessonProgramResponse> getAllUnassigned() {
+    public List<LessonProgramResponse> getAllUnassigned() { //atanmayan derken yani tabloda user kısmı boş
         return lessonProgramRepository.findByUsers_IdNull()
+                // bu yöntemle null olan farklı entity türlerinin Id'lerini kontrol edebiliriz
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toList());
     }
 
     public List<LessonProgramResponse> getAllAssigned() {
-
+     //tabloda user kolonunda id özelliği olan lesson programları getir
         return lessonProgramRepository.findByUsers_IdNotNull()
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
@@ -136,14 +137,35 @@ public class LessonProgramService {
     }
 
     public Set<LessonProgramResponse> getByTeacherId(Long teacherId) {
-        User teacher = methodHelper.isUserExist(teacherId);
-        methodHelper.checkRole(teacher, RoleType.TEACHER);
+        User teacher = methodHelper.isUserExist(teacherId); //böyle bir user varmı
+        methodHelper.checkRole(teacher, RoleType.TEACHER);  //var ise teacher mı
 
         return lessonProgramRepository.findByUsers_IdEquals(teacherId) // Derived
                 .stream()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toSet());
     }
+    /* bizim yazdığımız
+ public Set<LessonProgramResponse> getLessonProgramsByTeacherId(Long teacherId) {
+        //böyle bir user varmı
+        User teacher = methodHelper.isUserExist(teacherId);
+
+        //var ise teacher mı
+        methodHelper.checkRole(teacher, RoleType.TEACHER);
+
+       Set<LessonProgram> lessonProgramSet=lessonProgramRepository.getLessonProgramByUserId(teacherId);
+       return lessonProgramSet.stream().
+               map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
+               collect(Collectors.toSet());
+       */
+
+     /*username methodumuz vardı o şekilde de yapabiliriz.
+        return lessonProgramRepository.getLessonProgramByUsersUserName(teacher.getUsername())
+        .stream()
+        .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+        .collect(Collectors.toSet());
+ }
+ */
 
     public Set<LessonProgramResponse> getByStudentId(Long studentId) {
         User student = methodHelper.isUserExist(studentId);
@@ -154,4 +176,16 @@ public class LessonProgramService {
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toSet());
     }
+    /* bizim yazdığımız
+    public Set<LessonProgramResponse> getLessonProgramsByStudentId(Long studentId) {
+        User student= methodHelper.isUserExist(studentId);
+
+        methodHelper.checkRole(student,RoleType.STUDENT);
+
+        Set<LessonProgram> lessonProgramSet= lessonProgramRepository.getLessonProgramByUserId(studentId);
+        return lessonProgramSet.stream().
+                map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse).
+                collect(Collectors.toSet());
+}
+     */
 }

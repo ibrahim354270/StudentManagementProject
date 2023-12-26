@@ -85,15 +85,16 @@ public class LessonProgramController {
     }
 
     // Not: ( ODEV ) getLessonProgramsByTeacherId() ******
+
+    @GetMapping("/getAllLessonProgramByTeacherId/{teacherId}")//http://localhost:8080/lessonPrograms/getByTeacherId/1 +GET
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
-    @GetMapping("/getAllLessonProgramByTeacherId/{teacherId}")
     public Set<LessonProgramResponse> getByTeacherId(@PathVariable Long teacherId){
         return lessonProgramService.getByTeacherId(teacherId);
     }
 
     // Not : ( ODEV ) getLessonProgramsByStudentId() *****
+    @GetMapping("/getAllLessonProgramByStudentId/{studentId}")//http://localhost:8080/lessonPrograms/getByStudentId/1 +GET
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
-    @GetMapping("/getAllLessonProgramByStudentId/{studentId}")
     public Set<LessonProgramResponse> getByStudentId(@PathVariable Long studentId){
         return lessonProgramService.getByStudentId(studentId);
     }

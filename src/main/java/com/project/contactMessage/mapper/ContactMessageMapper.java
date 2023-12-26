@@ -13,6 +13,8 @@ public class ContactMessageMapper {
     // Request --> POJO
     public ContactMessage requestToContactMessage(ContactMessageRequest contactMessageRequest){
 
+
+        //builder=this ile yaptığımız const. işini arka planda kendisi yapıyor.
         return ContactMessage.builder()
                 .name(contactMessageRequest.getName())
                 .subject(contactMessageRequest.getSubject())
@@ -21,14 +23,21 @@ public class ContactMessageMapper {
                 .dateTime(LocalDateTime.now())
                 .build();
     }
-    //POJO --> Response
+
+    // POJO --> Response
     public ContactMessageResponse contactMessageToResponse(ContactMessage contactMessage){
+
         return ContactMessageResponse.builder()
                 .name(contactMessage.getName())
                 .subject(contactMessage.getSubject())
                 .message(contactMessage.getMessage())
                 .email(contactMessage.getEmail())
-                .dateTime(LocalDateTime.now())//contactMessage.getDateTime()
+                .dateTime(LocalDateTime.now()) // contactMessage.getDateTime()
                 .build();
+
     }
+
+
+
+
 }

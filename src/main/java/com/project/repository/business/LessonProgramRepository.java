@@ -14,6 +14,8 @@ public interface LessonProgramRepository extends JpaRepository<LessonProgram, Lo
 
     List<LessonProgram> findByUsers_IdNotNull();
 
+    // @@Query("SELECT l From LessonProgram l Where l.users.username=?1")
+    // iki tablonun kesişimi olan datalar için
     @Query("SELECT l FROM LessonProgram l INNER JOIN l.users users WHERE users.username = ?1")
     Set<LessonProgram> getLessonProgramByUsersUsername(String username);
 
@@ -22,4 +24,10 @@ public interface LessonProgramRepository extends JpaRepository<LessonProgram, Lo
     Set<LessonProgram> getLessonProgramByLessonProgramIdList(Set<Long> lessonIdSet);
 
     Set<LessonProgram> findByUsers_IdEquals(Long userId);
+    //bizim yazdığımız query ile aynı işelmi türetilmiş method da yapıyor.
+
+    //  @Query("SELECT l FROM LessonProgram l WHERE l.users.id=?1")
+    // Set<LessonProgram> getLessonProgramByUserId(Long teacherId);
+    // yukarıdaki kodumuz da hata aldık aşağıdaki gibi innier join ile çalıştı
+    // @Query("SELECT l FROM LessonProgram l INNER JOIN l.users users WHERE users.id=?1")
 }

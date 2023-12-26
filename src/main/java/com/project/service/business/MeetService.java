@@ -243,6 +243,7 @@ public ResponseMessage<MeetResponse> updateMeet(MeetRequest updateMeetRequest, L
     public ResponseEntity<List<MeetResponse>> getAllMeetByTeacher(HttpServletRequest httpServletRequest) {
         String userName = (String) httpServletRequest.getAttribute("username");
         User advisoryTeacher = methodHelper.isUserExistByUsername(userName);
+
         methodHelper.checkAdvisor(advisoryTeacher);
 
         List<MeetResponse> meetResponseList =
